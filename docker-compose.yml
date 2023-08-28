@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: core
+      POSTGRES_USER: backend
+      POSTGRES_PASSWORD: idjcnqfgln
+    ports:
+      - "5433:5432"
+  rabbitmq:
+    image: "rabbitmq:management"
+    environment:
+      RABBITMQ_DEFAULT_USER: backend
+      RABBITMQ_DEFAULT_PASS: idjcnqfgln
+    ports:
+      - "5672:5672"
+      - "15672:15672"

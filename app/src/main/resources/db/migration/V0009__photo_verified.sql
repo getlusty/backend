@@ -1,0 +1,1 @@
+alter table profile_photo drop column verified;

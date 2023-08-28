@@ -1,0 +1,1 @@
+alter table device_locations add column created_at timestamp not null default now();

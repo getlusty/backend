@@ -1,0 +1,1 @@
+alter table profile_photo add column verified boolean not null;

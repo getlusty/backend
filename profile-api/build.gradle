@@ -1,0 +1,8 @@
+plugins {
+    id 'java'
+    id "io.freefair.lombok" version "6.6"
+}
+
+dependencies {
+    implementation project(":common:jooq"), project(":file-store-api")
+}

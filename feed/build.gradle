@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'nu.studer.jooq' version "8.0"
+    id "io.freefair.lombok" version "6.6"
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+dependencies {
+    implementation project(":profile-api")
+    implementation project(":common:jooq")
+    implementation project(":common:web")
+    implementation project(":common:utils")
+    implementation project(":file-store-api")
+    implementation project(":common:broker")
+    implementation project(":common:cache")
+    jooqGenerator 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+jooq {
+    configurations {
+        main {
+            generateSchemaSourceOnCompilation = false
+
+            generationTool {
+                jdbc {
+                    driver = "org.postgresql.Driver"
+                    url = "jdbc:postgresql://localhost:5433/core"
+                    user = "backend"
+                    password = "idjcnqfgln"
+                }
+                generator {
+                    name = "org.jooq.codegen.DefaultGenerator"
+                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = "public"
+                        includes = """
+                            matches
+                        """
+                        forcedTypes {
+                            forcedType {
+                                userType = "java.time.Instant"
+                                converter = "ru.lusty.backend.common.jooq.JooqInstantConverter"
+                                includeTypes = "TIMESTAMP"
+                            }
+                        }
+                    }
+                    generate {
+                        daos = false
+                        deprecated = false
+                        immutablePojos = false
+                        javaTimeTypes = true
+                        records = true
+                        fluentSetters = true
+                        relations = true
+                    }
+                    target {
+                        packageName = "ru.lusty.backend.profile.records"
+                        directory = "src/main/jooq"  // default (can be omitted)
+                    }
+                }
+            }
+        }
+    }
+}

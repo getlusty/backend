@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'nu.studer.jooq' version "8.0"
+    id "io.freefair.lombok" version "6.6"
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+dependencies {
+    implementation project(":common:cache"), project(":common:jooq"), project(":common:utils")
+    compileOnly 'ru.lusty:auth-api:1.0.0'
+    jooqGenerator 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+}
+
+jooq {
+    configurations {
+        main {
+            generateSchemaSourceOnCompilation = false
+
+            generationTool {
+                jdbc {
+                    driver = "org.postgresql.Driver"
+                    url = "jdbc:postgresql://localhost:5433/core"
+                    user = "backend"
+                    password = "idjcnqfgln"
+                }
+                generator {
+                    name = "org.jooq.codegen.DefaultGenerator"
+                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = "public"
+                        includes = """
+                            websocket_sessions
+                        """
+                        forcedTypes {
+                            forcedType {
+                                userType = "java.time.Instant"
+                                converter = "ru.lusty.backend.common.jooq.JooqInstantConverter"
+                                includeTypes = "TIMESTAMP"
+                            }
+                        }
+                    }
+                    generate {
+                        daos = false
+                        deprecated = false
+                        immutablePojos = false
+                        javaTimeTypes = true
+                        records = true
+                        fluentSetters = true
+                        relations = true
+                    }
+                    target {
+                        packageName = "ru.lusty.backend.location.records"
+                        directory = "src/main/jooq"  // default (can be omitted)
+                    }
+                }
+            }
+        }
+    }
+}
